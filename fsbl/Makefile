@@ -1,53 +1,103 @@
+TOPDIR ?= $(CURDIR)
+
 CROSS_COMPILER_PATH := /home/werwolv/Development/buildroot/output/host/bin
-PREFIX := arm-linux-
+PREFIX 				:= arm-linux-
 
-ARM_GCC := $(CROSS_COMPILER_PATH)/$(PREFIX)gcc
-ARM_G++ := $(CROSS_COMPILER_PATH)/$(PREFIX)g++
-ARM_OBJCOPY := $(CROSS_COMPILER_PATH)/$(PREFIX)objcopy
-ARM_LD := $(CROSS_COMPILER_PATH)/$(PREFIX)ld
-
-
-SOURCE_DIR := source
-BUILD_DIR := build
-
-NULL :=
-SPACE := $(NULL) $(NULL)
-
-SOURCE_FILES = $(wildcard $(SOURCE_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/*.c) $(wildcard $(SOURCE_DIR)/*.s)
-BUILD_FILES = $(filter %.o,$(patsubst $(SOURCE_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCE_FILES)) $(patsubst $(SOURCE_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCE_FILES)) $(patsubst $(SOURCE_DIR)/%.s,$(BUILD_DIR)/%.o,$(SOURCE_FILES)))
-
-CFLAGS := -nolibc -fPIE
-CPPFLAGS := $(CFLAGS) -nodefaultlibs -fno-exceptions
-LDFLAGS := -nostartfiles -T $(CURDIR)/linker.ld -nolibc
+ARM_GCC 		:= $(CROSS_COMPILER_PATH)/$(PREFIX)gcc
+ARM_G++ 		:= $(CROSS_COMPILER_PATH)/$(PREFIX)g++
+ARM_OBJCOPY 	:= $(CROSS_COMPILER_PATH)/$(PREFIX)objcopy
+ARM_LD 			:= $(CROSS_COMPILER_PATH)/$(PREFIX)ld
 
 
+TOPDIR ?= $(CURDIR)
 
-.PHONY: all clean
+BUILD			:=	build
+SOURCES_TOP		:=	source
+SOURCES			+=  $(foreach dir,$(SOURCES_TOP),$(shell find $(dir) -type d 2>/dev/null))
+INCLUDES		:=	include
 
-all: fsbl.stm32
+ARCH		:=	-fPIE
+
+null      	:=
+SPACE     	:=  $(null) $(null)
+
+DEFINES 	+= -DCORE_CA7 -DSTM32MP157Cxx
+
+COMMONFLAGS	:=  -g -O3 -ffunction-sections -fPIE \
+				$(ARCH) $(DEFINES) 				 \
+				$(INCLUDE)
+
+CFLAGS		:=	$(COMMONFLAGS)
+
+CPPFLAGS	:=  $(COMMONFLAGS) -std=gnu++2a -fno-exceptions
+
+ASFLAGS		:=	-g $(ARCH)
+LDFLAGS		:=	-g -nostdlib -nostartfiles -T $(TOPDIR)/linker.ld
+
+
+ifneq ($(BUILD),$(notdir $(CURDIR)))
+
+export TOPDIR	:=	$(CURDIR)
+
+export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+
+export DEPSDIR	:=	$(CURDIR)/$(BUILD)
+
+CFILES			:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CPPFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+SFILES			:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
+
+
+export OFILES 		:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+
+export INCLUDE		:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
+						$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+						-I$(CURDIR)/$(BUILD)
+
+
+.PHONY: $(BUILD) clean all
+
+all: $(BUILD)
+
+$(BUILD):
+	@[ -d $@ ] || mkdir -p $@ $(BUILD)
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 clean:
-	@rm -rf fsbl.stm32
-	@rm -rf fsbl.bin
-	@rm -rf fsbl.elf
-	@rm -rf $(BUILD_DIR)
+	rm -fr $(BUILD) $(TOPDIR)/fsbl.stm32
 
-fsbl.stm32: fsbl.bin
-	python3 ./fix_header.py $< $@
+else
+
+.PHONY:	all
+
+DEPENDS	:=	$(OFILES:.o=.d)
+
+all: $(TOPDIR)/fsbl.stm32
+
+$(TOPDIR)/fsbl.stm32: fsbl.bin
+	python3 $(TOPDIR)/fix_header.py $< $@
 
 fsbl.bin: fsbl.elf
 	$(ARM_OBJCOPY) -S -O binary $< $@
 
-fsbl.elf: $(BUILD_FILES)
-	$(ARM_LD) $(LDFLAGS) -o $@ $^
+fsbl.elf: $(OFILES)
 
-$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+%.o: %.cpp
 	@mkdir -p $(@D)
-	$(ARM_G++) $(CPPFLAGS) -c -o $@ $<
+	$(ARM_G++) -MMD -MP -MF $*.d $(CPPFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.s
+%.o: %.c
 	@mkdir -p $(@D)
-	$(ARM_GCC) $(CFLAGS) -c -o $@ $<
+	$(ARM_GCC) -MMD -MP -MF $*.d $(CFLAGS) -c $< -o $@
 
-CFLAGS += -MMD
--include $(BUILD_FILES:.o=.d)
+%.o: %.s
+	@mkdir -p $(@D)
+	$(ARM_GCC) -MMD -MP -MF $*.d -x assembler-with-cpp $(ASFLAGS) -c $< -o $@
+
+%.elf:
+	$(ARM_LD) $(LDFLAGS) $(OFILES) -o $@
+
+-include $(DEPENDS)
+
+endif

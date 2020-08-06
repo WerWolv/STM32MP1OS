@@ -17,7 +17,7 @@ header = struct.pack("<ccccQQQQQQQQIIIIIIIIIIQQQQQQQQ83xb",
     len(payload),                                                                       # Length of payload
     0x2FFC0000 + 0x2400 + 0x100,                                                        # Entrypoint address. SYSRAM + 0x2400 to skip past boot ROM data + 0x100 to skip past this header
     0x00,                                                                               # Reserved
-    0x2FFC0000 + 0x2400 + 0x100,                                                        # Load address of image, unused
+    0x2FFC0000 + 0x2400,                                                                # Load address of image, unused
     0x00,                                                                               # Reserved
     0x00,                                                                               # Image version                                                                         
     0x01,                                                                               # Option flags, disable signature verification

@@ -1,10 +1,14 @@
+/* SYSRAM starts at 0x2FFC'0000 but first 0x2400 bytes are reserved for
+   the BootROM data/bss segments. FSBL will be loaded at 0x2FFC2400.
+*/
 MEMORY {
-    SYSRAM (rwx)    :   ORIGIN = 0x2FFC2400, LENGTH = 256K
+    SYSRAM (rwx)    :   ORIGIN = 0x2FFC2400, LENGTH = 256K 
 }
 
 ENTRY(_start);
 
 SECTIONS {
+    /* 0x100 bytes at the start reserved for header */
     .header : {
         FILL(0xFF);
         BYTE(0xFF);
@@ -12,7 +16,7 @@ SECTIONS {
     } >SYSRAM
 
     .text : {
-        *(.crt0)
+        *(.crt0) /* Make sure entry point is actually right after the header */
         *(.text)
         *(.text*)
 

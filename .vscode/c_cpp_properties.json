@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "STM32MP1",
+            "includePath": [
+                "${workspaceFolder}/fsbl/include",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/STM32MP1xx_HAL_Driver/Inc",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/CMSIS",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/CMSIS/Include",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/CMSIS/Core/Include",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/CMSIS/Core_A/Include",
+                "${workspaceFolder}/fsbl/stm32mp1/Drivers/CMSIS/Device/ST/STM32MP1xx/Include"
+            ],
+            "defines": [ "CORE_CA7", "STM32MP157Cxx", "USE_FULL_LL_DRIVER" ],
+            "compilerPath": "${env:HOME}/buildroot/output/host/bin/arm-linux-g++",
+            "cStandard": "c11",
+            "cppStandard": "gnu++20",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
