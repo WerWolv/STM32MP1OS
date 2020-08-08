@@ -1,4 +1,7 @@
 fsbl/build/*
 fsbl/fsbl.stm32
 
+tmp/
+genimage.tmp/
+
 sdcard.img

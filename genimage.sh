@@ -12,7 +12,7 @@ EOF
 opts="$(getopt -n "${0##*/}" -o c: -- "$@")" || exit $?
 eval set -- "$opts"
 
-GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
+GENIMAGE_TMP="./genimage.tmp"
 
 while true ; do
 	case "$1" in

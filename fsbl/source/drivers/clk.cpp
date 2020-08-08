@@ -69,16 +69,16 @@ namespace mp1::clk {
             case PLL::PLL3:
                 switch (source) {
                     case Oscillator::HSI:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), 0x00U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), u32(0x00), mmio::bit(0) | mmio::bit(1));
                         break;
                     case Oscillator::HSE:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), 0x01U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), u32(0x01), mmio::bit(0) | mmio::bit(1));
                         break;
                     case Oscillator::CSI:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), 0x02U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), u32(0x02), mmio::bit(0) | mmio::bit(1));
                         break;
                     case Oscillator::None:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), 0x03U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK3SELR), u32(0x03), mmio::bit(0) | mmio::bit(1));
                         break;
                     default: utl::panic();
                 }
@@ -86,13 +86,13 @@ namespace mp1::clk {
             case PLL::PLL4:
                 switch (source) {
                     case Oscillator::HSI:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), 0x00U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), u32(0x00), mmio::bit(0) | mmio::bit(1));
                         break;
                     case Oscillator::HSE:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), 0x01U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), u32(0x01), mmio::bit(0) | mmio::bit(1));
                         break;
                     case Oscillator::CSI:
-                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), 0x02U, mmio::bit(0) | mmio::bit(1));
+                        mmio::modify(mmio::toAddress(Bank::RCC, Register::RCK4SELR), u32(0x02), mmio::bit(0) | mmio::bit(1));
                         break;
                     /*
                     case Oscillator::I2C_CKIN:

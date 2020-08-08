@@ -1,12 +1,12 @@
 TOPDIR ?= $(CURDIR)
 
-CROSS_COMPILER_PATH := /home/werwolv/Development/buildroot/output/host/bin
-PREFIX 				:= arm-linux-
+CROSS_COMPILER_PATH := 
+PREFIX 				:= arm-none-eabi-
 
-ARM_GCC 		:= $(CROSS_COMPILER_PATH)/$(PREFIX)gcc
-ARM_G++ 		:= $(CROSS_COMPILER_PATH)/$(PREFIX)g++
-ARM_OBJCOPY 	:= $(CROSS_COMPILER_PATH)/$(PREFIX)objcopy
-ARM_LD 			:= $(CROSS_COMPILER_PATH)/$(PREFIX)ld
+ARM_GCC 		:= $(CROSS_COMPILER_PATH)$(PREFIX)gcc
+ARM_G++ 		:= $(CROSS_COMPILER_PATH)$(PREFIX)g++
+ARM_OBJCOPY 	:= $(CROSS_COMPILER_PATH)$(PREFIX)objcopy
+ARM_LD 			:= $(CROSS_COMPILER_PATH)$(PREFIX)ld
 
 
 TOPDIR ?= $(CURDIR)
@@ -32,7 +32,7 @@ CFLAGS		:=	$(COMMONFLAGS)
 CPPFLAGS	:=  $(COMMONFLAGS) -std=gnu++2a -fno-exceptions
 
 ASFLAGS		:=	-g $(ARCH)
-LDFLAGS		:=	-g -nostdlib -nostartfiles -T $(TOPDIR)/linker.ld
+LDFLAGS		:=	-g -nostartfiles -T $(TOPDIR)/linker.ld
 
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
